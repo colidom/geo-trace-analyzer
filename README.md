@@ -111,7 +111,7 @@ Los archivos deben tener las siguientes columnas: `time`, `precision`, y `locati
 
 ## Ejemplo visual
 
-<img src="example_map.png" alt="Mapa generado" width="600">
+<img src="img/example_map.png" alt="Mapa generado" width="600">
 
 ## Contribuciones
 

@@ -78,20 +78,30 @@ GeoTrace Analyzer/
 
 ## Ejemplo de entrada
 
-### Archivo `A.csv` (Agresores)
+### Formato requerido para los ficheros CSV:
+
+Los archivos deben tener las siguientes columnas: `time`, `precision`, y `location` (coordenadas en formato "latitud,longitud").
+
+#### Archivo `A.csv` (Agresores):
 
 ```csv
-location,time,precision
-28.416768,-16.552114,2023-12-01 08:30:00,5
-28.418540,-16.551460,2023-12-01 08:45:00,3
+"time","precision","location"
+"2024-12-20 22:05:20",4.5,"28.416768,-16.553500"
+"2024-12-20 22:14:57",0.0,"28.417200,-16.553600"
+"2024-12-20 22:14:59",4.5,"28.417800,-16.554000"
+"2024-12-20 22:22:59",4.5,"28.418400,-16.554400"
+"2024-12-20 22:26:44",4.5,"28.418900,-16.554800"
+"2024-12-20 22:37:45",11.8,"28.419500,-16.555200"
+"2024-12-20 22:37:46",11.8,"28.420000,-16.555600"
 ```
 
-### Archivo `V.csv` (Víctimas)
+#### Archivo `V.csv` (Víctimas):
 
 ```csv
-location,time,precision
-28.414500,-16.550950,2023-12-01 08:30:00,4
-28.415200,-16.549800,2023-12-01 08:50:00,2
+"time","precision","location"
+"2024-12-20 22:10:20",3.0,"28.415500,-16.552900"
+"2024-12-20 22:15:50",4.2,"28.416000,-16.553300"
+"2024-12-20 22:20:30",5.0,"28.416500,-16.553700"
 ```
 
 ## Personalización

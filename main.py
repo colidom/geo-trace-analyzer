@@ -35,10 +35,11 @@ def main():
     proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
 
     # Flujo principal
-    Aggressor_file = get_csv_file(os.path.join(data_folder, "A"))  # Carpeta del agresor
-    Victim_file = get_csv_file(os.path.join(data_folder, "V"))  # Carpeta de la víctima
-    aggressor_data = read_data(Aggressor_file)
-    victim_data = read_data(Victim_file)
+    aggressor_file = get_csv_file(os.path.join(data_folder, "A.csv"))
+    victim_file = get_csv_file(os.path.join(data_folder, "V.csv"))
+
+    aggressor_data = read_data(aggressor_file)
+    victim_data = read_data(victim_file)
 
     map_view = initialize_map(secured_area)
 
@@ -56,7 +57,9 @@ def main():
             victim_lat, victim_lng = victim_coordinates
 
         for _, aggressor_row in aggressor_data.iterrows():
-            aggressor_coordinates = process_location(aggressor_row, location_column="location")
+            aggressor_coordinates = process_location(
+                aggressor_row, location_column="location"
+            )
 
             if aggressor_coordinates:
                 aggressor_lat, aggressor_lng = aggressor_coordinates

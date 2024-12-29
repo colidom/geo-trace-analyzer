@@ -11,16 +11,11 @@ class GeoMap:
     def add_safe_zone(self, secured_area, proximity_distance):
         """Agrega un marcador y un círculo de proximidad para la zona segura con información detallada."""
         lat, lng = secured_area
-        tooltip_text = f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
 
-        self.add_marker(secured_area, tooltip_text, "blue", "home")
+        tooltip = self.add_tooltip(None, lng, lat, None, "Domicilio")
 
-        self.add_proximity_circle(
-            secured_area,
-            proximity_distance,
-            "blue",
-            f"Secured Area: {proximity_distance}m",
-        )
+        self.add_marker(secured_area, tooltip, "blue", "home")
+        self.add_proximity_circle(secured_area, proximity_distance, "blue", tooltip)
 
     def add_proximity_circle(self, location, proximity_distance, color, tooltip):
         """Crea un círculo de proximidad alrededor de una ubicación."""
@@ -65,14 +60,24 @@ class GeoMap:
         else:
             print(f"Tipo no esperado en 'location': {type(location)}")
 
-    def add_tooltip(self, position, lng, lat, row):
-        """Crea un tooltip para incrustarlo en el mapa"""
-        return (
-            f"<b>Coordenada:</b> {position}<br>"
-            f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
-            f"<b>Precision:</b> {row.get('precision', 'N/A')}<br>"
-            f"<b>Time:</b> {row.get('time', 'N/A')}"
-        )
+    def add_tooltip(self, position=None, lng=None, lat=None, row=None, name=None):
+        """Crea un tooltip para incrustarlo en el mapa."""
+
+        tooltip = f"<center>{name}</center>"
+
+        if position is not None and lng is not None and lat is not None:
+            tooltip += (
+                f"<b>Coordenada:</b> {position}<br>"
+                f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
+            )
+
+        if row is not None:
+            precision = row.get("precision", "N/A") if hasattr(row, "get") else "N/A"
+            time = row.get("time", "N/A") if hasattr(row, "get") else "N/A"
+
+            tooltip += f"<b>Precision:</b> {precision}<br>" f"<b>Time:</b> {time}"
+
+        return tooltip
 
     def check_prox_and_add_markers(
         self, victim_data, aggressor_data, proximity_distance
@@ -121,7 +126,7 @@ class GeoMap:
 
                 if aggressor_nearby:
                     tooltip_text = self.add_tooltip(
-                        victim_position, victim_lng, victim_lat, victim_row
+                        victim_position, victim_lng, victim_lat, victim_row, "Víctima"
                     )
 
                     self.add_marker(
@@ -141,7 +146,11 @@ class GeoMap:
                 aggressor_positions.append((aggressor_lat, aggressor_lng))
 
                 tooltip_text = self.add_tooltip(
-                    aggressor_position, aggressor_lng, aggressor_lat, aggressor_row
+                    aggressor_position,
+                    aggressor_lng,
+                    aggressor_lat,
+                    aggressor_row,
+                    "Agresor",
                 )
 
                 self.add_marker(

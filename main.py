@@ -1,12 +1,7 @@
-import os
 from dotenv import load_dotenv
+import os
 from utils.filesystem import get_csv_file, read_data, create_directories
-from utils.map import (
-    initialize_map,
-    add_safe_zone,
-    save_map,
-    check_prox_and_add_markers,
-)
+from utils.map import Map
 
 
 def main():
@@ -27,11 +22,11 @@ def main():
     victim_file = get_csv_file(os.path.join(data_folder, "V.csv"))
     aggressor_data = read_data(aggressor_file)
     victim_data = read_data(victim_file)
-    map_view = initialize_map((secured_area_lat, secured_area_lng))
 
-    add_safe_zone(map_view, (secured_area_lat, secured_area_lng), prox_distance)
-    check_prox_and_add_markers(map_view, victim_data, aggressor_data, prox_distance)
-    save_map(map_view, result_folder, output_map)
+    map_view = Map((secured_area_lat, secured_area_lng))
+    map_view.add_safe_zone((secured_area_lat, secured_area_lng), prox_distance)
+    map_view.check_prox_and_add_markers(victim_data, aggressor_data, prox_distance)
+    map_view.save(result_folder, output_map)
 
 
 if __name__ == "__main__":

@@ -13,22 +13,40 @@ class GeoMap:
         lat, lng = secured_area
         tooltip_text = f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
 
-        # Agregar marcador para la zona segura
-        folium.Marker(
-            location=secured_area,
-            tooltip=tooltip_text,
-            icon=folium.Icon(color="blue", icon="home", prefix="fa"),
-        ).add_to(self.map)
+        self.add_marker(secured_area, tooltip_text, "blue", "home")
 
-        # Agregar círculo para la zona de proximidad de la zona segura
+        self.add_proximity_circle(
+            secured_area,
+            proximity_distance,
+            "blue",
+            f"Secured Area: {proximity_distance}m",
+        )
+
+    def add_proximity_circle(self, location, proximity_distance, color, tooltip):
+        """Crea un círculo de proximidad alrededor de una ubicación."""
         folium.Circle(
-            location=secured_area,
+            location=location,
             radius=proximity_distance,
-            color="blue",
+            color=color,
             fill=True,
             fill_opacity=0.2,
-            tooltip=f"Secured Area: {proximity_distance}m",
+            tooltip=tooltip,
         ).add_to(self.map)
+
+    def add_marker(self, location, tooltip, color, icon):
+        """Agrega un marcador con información y un icono."""
+        folium.Marker(
+            location=location,
+            tooltip=tooltip,
+            icon=folium.Icon(color=color, icon=icon, prefix="fa"),
+        ).add_to(self.map)
+
+    def add_aggressor_route(self, aggressor_positions, color):
+        """Añade el recorrido de los agresores como una línea poligonal al mapa."""
+        if len(aggressor_positions) > 1:
+            folium.PolyLine(
+                aggressor_positions, color=color, weight=2.5, opacity=1
+            ).add_to(self.map)
 
     def save(self, result_folder, output_file):
         """Guarda el mapa en un archivo HTML."""
@@ -58,10 +76,8 @@ class GeoMap:
         victim_position = 1
         aggressor_position = 1
 
-        # Lista para almacenar las coordenadas de los agresores
         aggressor_positions = []
 
-        # Procesar las víctimas y verificar proximidad
         for _, victim_row in victim_data.iterrows():
             victim_coordinates = process_location(
                 victim_row, location_column="location"
@@ -79,7 +95,6 @@ class GeoMap:
                     if aggressor_coordinates:
                         aggressor_lat, aggressor_lng = aggressor_coordinates
 
-                        # Calcular la distancia entre la víctima y el agresor
                         distance = calculate_distance(
                             (victim_lat, victim_lng), (aggressor_lat, aggressor_lng)
                         )
@@ -97,7 +112,7 @@ class GeoMap:
 
                 if aggressor_nearby:
                     tooltip_text = (
-                        f"<b>Posición víctima:</b> {victim_position}<br>"
+                        f"<b>Coordenada:</b> {victim_position}<br>"
                         f"<b>Lon:</b> {victim_lng}<br><b>Lat:</b> {victim_lat}<br>"
                         f"<b>Precision:</b> {victim_row.get('precision', 'N/A')}<br>"
                         f"<b>Time:</b> {victim_row.get('time', 'N/A')}"
@@ -121,7 +136,7 @@ class GeoMap:
                 aggressor_positions.append((aggressor_lat, aggressor_lng))
 
                 tooltip_text = (
-                    f"<b>Posición agresor:</b> {aggressor_position}<br>"
+                    f"<b>Coordenada:</b> {aggressor_position}<br>"
                     f"<b>Lon:</b> {aggressor_lng}<br><b>Lat:</b> {aggressor_lat}<br>"
                     f"<b>Precision:</b> {aggressor_row.get('precision', 'N/A')}<br>"
                     f"<b>Time:</b> {aggressor_row.get('time', 'N/A')}"
@@ -134,7 +149,4 @@ class GeoMap:
 
                 aggressor_position += 1
 
-        if len(aggressor_positions) > 1:
-            folium.PolyLine(
-                aggressor_positions, color="red", weight=2.5, opacity=1
-            ).add_to(self.map)
+        self.add_aggressor_route(aggressor_positions, "red")

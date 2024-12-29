@@ -64,15 +64,20 @@ class GeoMap:
             print(f"Tipo no esperado en 'location': {type(location)}")
 
     def add_tooltip(self, position=None, lng=None, lat=None, row=None, name=None):
-        """Crea un tooltip para incrustarlo en el mapa."""
+        """Crea un tooltip para incrustarlo en el mapa con la información requerida"""
 
         tooltip = f"<center>{name}</center>"
 
-        if position is not None and lng is not None and lat is not None:
-            tooltip += (
-                f"<b>Coordenada:</b> {position}<br>"
-                f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
-            )
+        if position is None:
+            if lng is not None and lat is not None:
+                tooltip += f"<b>Lon:</b> {lng}<br>" f"<b>Lat:</b> {lat}<br>"
+        else:
+            if lng is not None and lat is not None:
+                tooltip += (
+                    f"<b>Coordenada:</b> {position}<br>"
+                    f"<b>Lon:</b> {lng}<br>"
+                    f"<b>Lat:</b> {lat}<br>"
+                )
 
         if row is not None:
             precision = row.get("precision", "N/A") if hasattr(row, "get") else "N/A"

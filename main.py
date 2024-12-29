@@ -1,7 +1,7 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from utils.filesystem import get_csv_file, read_data, create_directories
-from utils.map import Map
+from classes.GeoMap import GeoMap
 
 
 def main():
@@ -23,10 +23,11 @@ def main():
     aggressor_data = read_data(aggressor_file)
     victim_data = read_data(victim_file)
 
-    map_view = Map((secured_area_lat, secured_area_lng))
-    map_view.add_safe_zone((secured_area_lat, secured_area_lng), prox_distance)
-    map_view.check_prox_and_add_markers(victim_data, aggressor_data, prox_distance)
-    map_view.save(result_folder, output_map)
+    geo_map = GeoMap((secured_area_lat, secured_area_lng))
+
+    geo_map.add_safe_zone((secured_area_lat, secured_area_lng), prox_distance)
+    geo_map.check_prox_and_add_markers(victim_data, aggressor_data, prox_distance)
+    geo_map.save(result_folder, output_map)
 
 
 if __name__ == "__main__":

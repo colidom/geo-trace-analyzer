@@ -65,6 +65,14 @@ class GeoMap:
         else:
             print(f"Tipo no esperado en 'location': {type(location)}")
 
+    def add_tooltip(self, position, lng, lat, row):
+        return (
+            f"<b>Coordenada:</b> {position}<br>"
+            f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"
+            f"<b>Precision:</b> {row.get('precision', 'N/A')}<br>"
+            f"<b>Time:</b> {row.get('time', 'N/A')}"
+        )
+
     def check_prox_and_add_markers(
         self, victim_data, aggressor_data, proximity_distance
     ):
@@ -111,17 +119,13 @@ class GeoMap:
                             ).add_to(self.map)
 
                 if aggressor_nearby:
-                    tooltip_text = (
-                        f"<b>Coordenada:</b> {victim_position}<br>"
-                        f"<b>Lon:</b> {victim_lng}<br><b>Lat:</b> {victim_lat}<br>"
-                        f"<b>Precision:</b> {victim_row.get('precision', 'N/A')}<br>"
-                        f"<b>Time:</b> {victim_row.get('time', 'N/A')}"
+                    tooltip_text = self.add_tooltip(
+                        victim_position, victim_lng, victim_lat, victim_row
                     )
-                    folium.Marker(
-                        location=(victim_lat, victim_lng),
-                        tooltip=tooltip_text,
-                        icon=folium.Icon(color="green", icon="female", prefix="fa"),
-                    ).add_to(self.map)
+
+                    self.add_marker(
+                        (victim_lat, victim_lng), tooltip_text, "green", "female"
+                    )
 
                 victim_position += 1
 
@@ -135,17 +139,13 @@ class GeoMap:
                 aggressor_lat, aggressor_lng = aggressor_coordinates
                 aggressor_positions.append((aggressor_lat, aggressor_lng))
 
-                tooltip_text = (
-                    f"<b>Coordenada:</b> {aggressor_position}<br>"
-                    f"<b>Lon:</b> {aggressor_lng}<br><b>Lat:</b> {aggressor_lat}<br>"
-                    f"<b>Precision:</b> {aggressor_row.get('precision', 'N/A')}<br>"
-                    f"<b>Time:</b> {aggressor_row.get('time', 'N/A')}"
+                tooltip_text = self.add_tooltip(
+                    aggressor_position, aggressor_lng, aggressor_lat, aggressor_row
                 )
-                folium.Marker(
-                    location=(aggressor_lat, aggressor_lng),
-                    tooltip=tooltip_text,
-                    icon=folium.Icon(color="red", icon="male", prefix="fa"),
-                ).add_to(self.map)
+
+                self.add_marker(
+                    (aggressor_lat, aggressor_lng), tooltip_text, "red", "male"
+                )
 
                 aggressor_position += 1
 

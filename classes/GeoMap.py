@@ -15,7 +15,10 @@ class GeoMap:
         tooltip = self.add_tooltip(None, lng, lat, None, "Domicilio")
 
         self.add_marker(secured_area, tooltip, "blue", "home")
-        self.add_proximity_circle(secured_area, proximity_distance, "blue", tooltip)
+        circle_tooltip = f"Secured Area: {proximity_distance}m"
+        self.add_proximity_circle(
+            secured_area, proximity_distance, "blue", circle_tooltip
+        )
 
     def add_proximity_circle(self, location, proximity_distance, color, tooltip):
         """Crea un círculo de proximidad alrededor de una ubicación."""

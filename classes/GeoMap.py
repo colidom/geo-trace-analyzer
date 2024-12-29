@@ -66,6 +66,7 @@ class GeoMap:
             print(f"Tipo no esperado en 'location': {type(location)}")
 
     def add_tooltip(self, position, lng, lat, row):
+        """Crea un tooltip para incrustarlo en el mapa"""
         return (
             f"<b>Coordenada:</b> {position}<br>"
             f"<b>Lon:</b> {lng}<br><b>Lat:</b> {lat}<br>"

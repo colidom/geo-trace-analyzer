@@ -57,16 +57,20 @@ def check_prox_and_add_markers(
     """
     Verifica la proximidad de las víctimas con los agresores y añade marcadores al mapa
     solo si hay un agresor dentro del área de proximidad de la víctima.
+    También dibuja el recorrido de los agresores.
     """
     victim_position = 1
     aggressor_position = 1
 
+    # Lista para almacenar las coordenadas de los agresores
+    aggressor_positions = []
+
+    # Procesar las víctimas y verificar proximidad
     for _, victim_row in victim_data.iterrows():
         victim_coordinates = process_location(victim_row, location_column="location")
 
         if victim_coordinates:
             victim_lat, victim_lng = victim_coordinates
-
             aggressor_nearby = False
 
             for _, aggressor_row in aggressor_data.iterrows():
@@ -77,6 +81,7 @@ def check_prox_and_add_markers(
                 if aggressor_coordinates:
                     aggressor_lat, aggressor_lng = aggressor_coordinates
 
+                    # Calcular la distancia entre la víctima y el agresor
                     distance = calculate_distance(
                         (victim_lat, victim_lng), (aggressor_lat, aggressor_lng)
                     )
@@ -107,7 +112,7 @@ def check_prox_and_add_markers(
 
             victim_position += 1
 
-    # Añadir marcadores de agresores
+    # Añadir marcadores y recopilar las posiciones de los agresores
     for _, aggressor_row in aggressor_data.iterrows():
         aggressor_coordinates = process_location(
             aggressor_row, location_column="location"
@@ -115,6 +120,7 @@ def check_prox_and_add_markers(
 
         if aggressor_coordinates:
             aggressor_lat, aggressor_lng = aggressor_coordinates
+            aggressor_positions.append((aggressor_lat, aggressor_lng))
 
             tooltip_text = (
                 f"<b>Posición agresor:</b> {aggressor_position}<br>"
@@ -129,3 +135,8 @@ def check_prox_and_add_markers(
             ).add_to(map_view)
 
             aggressor_position += 1
+
+    if len(aggressor_positions) > 1:
+        folium.PolyLine(aggressor_positions, color="red", weight=2.5, opacity=1).add_to(
+            map_view
+        )

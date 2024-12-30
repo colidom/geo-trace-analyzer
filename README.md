@@ -38,6 +38,7 @@ GeoTrace Analyzer es una herramienta avanzada para visualizar y analizar datos g
     ```
 
 4.  Configura el archivo `.env` en el directorio principal:
+
     ```env
     PROXIMITY_DISTANCE=200 # Distancia en metros
     SECURED_AREAS="[
@@ -46,7 +47,7 @@ GeoTrace Analyzer es una herramienta avanzada para visualizar y analizar datos g
     {\"name\": \"Centro de Estudios\", \"coordinates\": [28.41211, -16.550324], \"type\": \"school\"}
     ]"
 
-        ```
+    ```
 
 ## Estructura del proyecto
 

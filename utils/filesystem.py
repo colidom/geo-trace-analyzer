@@ -31,3 +31,9 @@ def create_directories(directories):
     """Crea múltiples directorios si no existen."""
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
+
+
+def process_secured_areas(obj, SECURED_AREAS, prox_distance):
+    """Procesa las zonas protegidas"""
+    for area in SECURED_AREAS:
+        obj.add_safe_zone(area, prox_distance)

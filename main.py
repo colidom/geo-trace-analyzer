@@ -1,7 +1,13 @@
 import os
+import json
 from dotenv import load_dotenv
-from utils.filesystem import get_csv_file, read_data, create_directories
-from classes.GeoMap import GeoMap
+from utils.filesystem import (
+    get_csv_file,
+    read_data,
+    create_directories,
+    process_secured_areas,
+)
+from classes.Map import Map
 
 
 def main():
@@ -15,19 +21,21 @@ def main():
     create_directories([data_folder, result_folder])
 
     prox_distance = int(os.getenv("PROXIMITY_DISTANCE"))
-    secured_area_str = os.getenv("SECURED_AREA")
-    secured_area_lat, secured_area_lng = map(float, secured_area_str.split(","))
+    secured_areas_str = os.getenv("SECURED_AREAS")
+    SECURED_AREAS = json.loads(secured_areas_str)
+    coordinates = SECURED_AREAS[0]["coordinates"]
 
     aggressor_file = get_csv_file(os.path.join(data_folder, "A.csv"))
     victim_file = get_csv_file(os.path.join(data_folder, "V.csv"))
     aggressor_data = read_data(aggressor_file)
     victim_data = read_data(victim_file)
 
-    geo_map = GeoMap((secured_area_lat, secured_area_lng))
+    map = Map(coordinates)
 
-    geo_map.add_safe_zone((secured_area_lat, secured_area_lng), prox_distance)
-    geo_map.check_prox_and_add_markers(victim_data, aggressor_data, prox_distance)
-    geo_map.save(result_folder, output_map)
+    process_secured_areas(map, SECURED_AREAS, prox_distance)
+
+    map.check_prox_and_add_markers(victim_data, aggressor_data, prox_distance)
+    map.save(result_folder, output_map)
 
 
 if __name__ == "__main__":

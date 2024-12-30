@@ -3,21 +3,22 @@ import os
 from utils.distance import calculate_distance, process_location
 
 
-class GeoMap:
+class Map:
     def __init__(self, center, zoom_start=15):
         """Inicializa el mapa centrado en una ubicación específica."""
         self.map = folium.Map(location=center, zoom_start=zoom_start)
 
     def add_safe_zone(self, secured_area, proximity_distance):
         """Agrega un marcador y un círculo de proximidad para la zona segura con información detallada."""
-        lat, lng = secured_area
+        name = secured_area["name"]
+        lat, lng = secured_area["coordinates"]
+        icon_type = secured_area["type"]
 
-        tooltip = self.add_tooltip(None, lng, lat, None, "Domicilio")
+        tooltip = self.add_tooltip(None, lng, lat, None, name)
 
-        self.add_marker(secured_area, tooltip, "blue", "home")
-        circle_tooltip = f"Secured Area: {proximity_distance}m"
+        self.add_marker(secured_area["coordinates"], tooltip, "blue", icon_type)
         self.add_proximity_circle(
-            secured_area, proximity_distance, "blue", circle_tooltip
+            secured_area["coordinates"], proximity_distance, "blue", tooltip
         )
 
     def add_proximity_circle(self, location, proximity_distance, color, tooltip):

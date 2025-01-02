@@ -17,31 +17,36 @@ GeoTrace Analyzer es una herramienta avanzada para visualizar y analizar datos g
 
 ## Instalación
 
-1. Clona este repositorio:
+1.  Clona este repositorio:
 
     ```bash
     git clone https://github.com/tu-usuario/geotrace-analyzer.git
     cd geotrace-analyzer
     ```
 
-2. Crea un entorno virtual y actívalo:
+2.  Crea un entorno virtual y actívalo:
 
     ```bash
     python -m venv venv
     source venv/bin/activate  # En Windows: venv\Scripts\activate
     ```
 
-3. Instala las dependencias:
+3.  Instala las dependencias:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-4. Configura el archivo `.env` en el directorio principal:
+4.  Configura el archivo `.env` en el directorio principal:
+
     ```env
-    SECURED_AREA_LAT=28.413966
-    SECURED_AREA_LNG=-16.548123
-    PROXIMITY_DISTANCE=200  # Distancia en metros
+    PROXIMITY_DISTANCE=200 # Distancia en metros
+    SECURED_AREAS="[
+    {\"name\": \"Domicilio\", \"coordinates\": [28.415868, -16.54943], \"type\": \"home\"},
+    {\"name\": \"Centro de Trabajo\", \"coordinates\": [28.419970, -16.541350], \"type\": \"briefcase\"},
+    {\"name\": \"Centro de Estudios\", \"coordinates\": [28.41211, -16.550324], \"type\": \"school\"}
+    ]"
+
     ```
 
 ## Estructura del proyecto
@@ -49,6 +54,8 @@ GeoTrace Analyzer es una herramienta avanzada para visualizar y analizar datos g
 ```plaintext
 GeoTrace Analyzer/
 │
+├── classes/               # Archivos CSV con datos de entrada
+│   ├── Map.py             # Contiene los métodos para manejar el mapa
 ├── data/                  # Archivos CSV con datos de entrada
 ├── result/                # Salida de mapas generados
 ├── utils/                 # Módulos auxiliares

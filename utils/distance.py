@@ -1,6 +1,8 @@
 from geopy.distance import geodesic
+from functools import lru_cache
 
 
+@lru_cache(maxsize=1024)
 def calculate_distance(coord1, coord2):
     """
     Calcula la distancia en metros entre dos coordenadas geográficas usando la librería geopy.

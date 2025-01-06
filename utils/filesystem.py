@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import json
+from dotenv import load_dotenv
 
 
 def get_csv_file(data_path):
@@ -37,3 +39,17 @@ def process_secured_areas(obj, SECURED_AREAS, prox_distance):
     """Procesa las zonas protegidas"""
     for area in SECURED_AREAS:
         obj.add_safe_zone(area, prox_distance)
+
+def load_configuration():
+    """Carga las configuraciones necesarias desde las variables de entorno."""
+    load_dotenv()
+    proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
+    secured_areas = json.loads(os.getenv("SECURED_AREAS"))
+    return proximity_distance, secured_areas
+
+
+def get_directories(base_dir):
+    """Devuelve las rutas de los directorios de datos y resultados."""
+    data_dir = os.path.join(base_dir, "data")
+    result_dir = os.path.join(base_dir, "result")
+    return data_dir, result_dir

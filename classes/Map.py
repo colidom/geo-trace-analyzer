@@ -64,7 +64,8 @@ class Map:
         else:
             print(f"Tipo no esperado en 'location': {type(location)}")
 
-    def add_tooltip(self, position=None, lng=None, lat=None, row=None, name=None):
+    @staticmethod
+    def add_tooltip(position=None, lng=None, lat=None, row=None, name=None):
         """Crea un tooltip para incrustarlo en el mapa con la información requerida"""
 
         tooltip = f"<center>{name}</center>"
@@ -88,84 +89,65 @@ class Map:
 
         return tooltip
 
-    def check_prox_and_add_markers(
-        self, victim_data, aggressor_data, proximity_distance
-    ):
+    def check_prox_and_add_markers(self, victim_data, aggressor_data, proximity_distance):
         """
-        Verifica la proximidad de las víctimas con los agresores y añade marcadores al mapa
-        solo si hay un agresor dentro del área de proximidad de la víctima.
+        Verifica la proximidad de las víctimas con los agresores y añade marcadores al mapa.
         También dibuja el recorrido de los agresores.
         """
-        victim_position = 1
-        aggressor_position = 1
+        victim_position = aggressor_position = 1
 
-        aggressor_positions = []
-
-        for _, victim_row in victim_data.iterrows():
-            victim_coordinates = process_location(
-                victim_row, location_column="location"
+        for _, victim_data_row in victim_data.iterrows():
+            victim_coordinates = self.process_victim(
+                victim_data_row, aggressor_data, proximity_distance, victim_position
             )
-
             if victim_coordinates:
-                victim_lat, victim_lng = victim_coordinates
-                aggressor_nearby = False
-
-                for _, aggressor_row in aggressor_data.iterrows():
-                    aggressor_coordinates = process_location(
-                        aggressor_row, location_column="location"
-                    )
-
-                    if aggressor_coordinates:
-                        aggressor_lat, aggressor_lng = aggressor_coordinates
-
-                        distance = calculate_distance(
-                            (victim_lat, victim_lng), (aggressor_lat, aggressor_lng)
-                        )
-
-                        if distance <= proximity_distance:
-                            aggressor_nearby = True
-                            folium.Circle(
-                                location=(victim_lat, victim_lng),
-                                radius=proximity_distance,
-                                color="orange",
-                                fill=True,
-                                fill_opacity=0.1,
-                                tooltip=f"Proximity Alert: {distance:.2f}m",
-                            ).add_to(self.map)
-
-                if aggressor_nearby:
-                    tooltip_text = self.add_tooltip(
-                        victim_position, victim_lng, victim_lat, victim_row, "Víctima"
-                    )
-
-                    self.add_marker(
-                        (victim_lat, victim_lng), tooltip_text, "green", "female"
-                    )
-
                 victim_position += 1
 
-        # Añadir marcadores y recopilar las posiciones de los agresores
+        aggressor_positions = self.process_aggressors(aggressor_data, aggressor_position)
+        self.add_aggressor_route(aggressor_positions, "red")
+
+    def process_victim(self, victim_data_row, aggressor_data, proximity_distance, victim_position):
+        victim_coordinates = process_location(
+            victim_data_row, location_column="location"
+        )
+        if not victim_coordinates:
+            return None
+        victim_lat, victim_lng = victim_coordinates
+        if self.is_aggressor_near(victim_lat, victim_lng, aggressor_data, proximity_distance):
+            tooltip_text = self.add_tooltip(victim_position, victim_lng, victim_lat, victim_data_row, "Víctima")
+            self.add_marker((victim_lat, victim_lng), tooltip_text, "green", "female")
+        return victim_coordinates
+
+    def is_aggressor_near(self, victim_lat, victim_lng, aggressor_data, proximity_distance):
+        aggressor_nearby = False
         for _, aggressor_row in aggressor_data.iterrows():
             aggressor_coordinates = process_location(
                 aggressor_row, location_column="location"
             )
+            if aggressor_coordinates:
+                aggressor_lat, aggressor_lng = aggressor_coordinates
+                distance = calculate_distance(
+                    (victim_lat, victim_lng), (aggressor_lat, aggressor_lng)
+                )
+                if distance <= proximity_distance:
+                    aggressor_nearby = True
+                    self.add_proximity_circle(
+                        (victim_lat, victim_lng), proximity_distance, "orange", f"Proximity Alert: {distance:.2f}m"
+                    )
+        return aggressor_nearby
 
+    def process_aggressors(self, aggressor_data, aggressor_position):
+        aggressor_positions = []
+        for _, aggressor_row in aggressor_data.iterrows():
+            aggressor_coordinates = process_location(
+                aggressor_row, location_column="location"
+            )
             if aggressor_coordinates:
                 aggressor_lat, aggressor_lng = aggressor_coordinates
                 aggressor_positions.append((aggressor_lat, aggressor_lng))
-
                 tooltip_text = self.add_tooltip(
-                    aggressor_position,
-                    aggressor_lng,
-                    aggressor_lat,
-                    aggressor_row,
-                    "Agresor",
+                    aggressor_position, aggressor_lng, aggressor_lat, aggressor_row, "Agresor"
                 )
-
-                self.add_marker(
-                    (aggressor_lat, aggressor_lng), tooltip_text, "red", "male"
-                )
-
+                self.add_marker((aggressor_lat, aggressor_lng), tooltip_text, "red", "male")
                 aggressor_position += 1
-
-        self.add_aggressor_route(aggressor_positions, "red")
+        return aggressor_positions

@@ -25,8 +25,20 @@ def get_csv_file(data_path):
 
 
 def read_data(csv_file):
-    """Lee un archivo CSV y lo devuelve como un DataFrame."""
-    return pd.read_csv(csv_file)
+    """
+    Lee un archivo CSV y devuelve un DataFrame con coordenadas filtradas
+    basándose en el valor de precisión definido en las configuraciones.
+    """
+    # Carga las configuraciones, incluida la precisión válida
+    _, _, valid_precision = load_configuration()
+
+    # Lee el archivo CSV
+    df = pd.read_csv(csv_file)
+
+    # Filtra las filas donde la precisión es menor o igual al valor permitido
+    filtered_df = df[df['precision'] <= valid_precision]
+
+    return filtered_df
 
 
 def create_directories(directories):
@@ -45,7 +57,8 @@ def load_configuration():
     load_dotenv()
     proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
     secured_areas = json.loads(os.getenv("SECURED_AREAS"))
-    return proximity_distance, secured_areas
+    valid_precision = json.loads(os.getenv("VALID_PRECISION"))
+    return proximity_distance, secured_areas, valid_precision
 
 
 def get_directories(base_dir):

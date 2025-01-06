@@ -16,7 +16,7 @@ def main():
     os.chdir(script_dir)
 
     # Preparar configuración y directorios
-    proximity_distance, secured_areas = load_configuration()
+    proximity_distance, secured_areas, valid_precision = load_configuration()
     data_dir, result_dir = get_directories(script_dir)
     create_directories([data_dir, result_dir])
 

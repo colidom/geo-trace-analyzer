@@ -107,16 +107,25 @@ class Map:
         self.add_aggressor_route(aggressor_positions, "red")
 
     def process_victim(self, victim_data_row, aggressor_data, proximity_distance, victim_position):
-        victim_coordinates = process_location(
-            victim_data_row, location_column="location"
-        )
+        victim_coordinates = self.get_coordinates(victim_data_row, "location")
         if not victim_coordinates:
             return None
         victim_lat, victim_lng = victim_coordinates
         if self.is_aggressor_near(victim_lat, victim_lng, aggressor_data, proximity_distance):
-            tooltip_text = self.add_tooltip(victim_position, victim_lng, victim_lat, victim_data_row, "Víctima")
-            self.add_marker((victim_lat, victim_lng), tooltip_text, "green", "female")
+            self.process_entity(victim_lat, victim_lng, victim_position, victim_data_row, "Víctima", "green", "female")
         return victim_coordinates
+
+    def process_aggressors(self, aggressor_data, aggressor_position):
+        aggressor_positions = []
+        for _, aggressor_row in aggressor_data.iterrows():
+            aggressor_coordinates = self.get_coordinates(aggressor_row, "location")
+            if aggressor_coordinates:
+                aggressor_lat, aggressor_lng = aggressor_coordinates
+                aggressor_positions.append((aggressor_lat, aggressor_lng))
+                self.process_entity(aggressor_lat, aggressor_lng, aggressor_position, aggressor_row, "Agresor", "red",
+                                    "male")
+                aggressor_position += 1
+        return aggressor_positions
 
     def is_aggressor_near(self, victim_lat, victim_lng, aggressor_data, proximity_distance):
         aggressor_nearby = False
@@ -136,18 +145,13 @@ class Map:
                     )
         return aggressor_nearby
 
-    def process_aggressors(self, aggressor_data, aggressor_position):
-        aggressor_positions = []
-        for _, aggressor_row in aggressor_data.iterrows():
-            aggressor_coordinates = process_location(
-                aggressor_row, location_column="location"
-            )
-            if aggressor_coordinates:
-                aggressor_lat, aggressor_lng = aggressor_coordinates
-                aggressor_positions.append((aggressor_lat, aggressor_lng))
-                tooltip_text = self.add_tooltip(
-                    aggressor_position, aggressor_lng, aggressor_lat, aggressor_row, "Agresor"
-                )
-                self.add_marker((aggressor_lat, aggressor_lng), tooltip_text, "red", "male")
-                aggressor_position += 1
-        return aggressor_positions
+    def process_entity(self, lat, lng, position, data_row, entity_type, color, icon):
+        tooltip_text = self.add_tooltip(position, lng, lat, data_row, entity_type)
+        self.add_marker((lat, lng), tooltip_text, color, icon)
+
+    def get_coordinates(self, data_row, location_column):
+        try:
+            return process_location(data_row, location_column=location_column)
+        except Exception as e:
+            print(f"Error al procesar coordenadas: {e}")
+            return None

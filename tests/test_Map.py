@@ -1,7 +1,5 @@
 # File: tests/test_Map.py
 
-import os
-
 import folium
 import pytest
 from classes.Map import Map

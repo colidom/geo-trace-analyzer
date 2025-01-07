@@ -1,4 +1,5 @@
-python-dotenv
-geopy
-folium
-pandas
+python-dotenv~=1.0.1
+geopy~=2.4.1
+folium~=0.19.3
+pandas~=2.2.3
+pytest~=8.3.4

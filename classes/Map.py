@@ -149,7 +149,8 @@ class Map:
         tooltip_text = self.add_tooltip(position, lng, lat, data_row, entity_type)
         self.add_marker((lat, lng), tooltip_text, color, icon)
 
-    def get_coordinates(self, data_row, location_column):
+    @staticmethod
+    def get_coordinates(data_row, location_column):
         try:
             return extract_coordinates(data_row, location_column)
         except Exception as e:

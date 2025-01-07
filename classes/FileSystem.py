@@ -11,7 +11,8 @@ class FileSystem:
         """Inicializa el FileSystem con un directorio base opcional."""
         self.base_dir = base_dir or os.getcwd()
 
-    def get_csv_file(self, data_path):
+    @staticmethod
+    def get_csv_file(data_path):
         """Detecta automáticamente el único archivo CSV en una carpeta o valida una ruta específica de archivo CSV."""
         if os.path.isfile(data_path):
             # Si es un archivo, verificamos que sea un CSV
@@ -30,26 +31,30 @@ class FileSystem:
         else:
             raise FileNotFoundError(f"No se encontró la ruta especificada: {data_path}")
 
-    def read_data(self, csv_file):
+    @staticmethod
+    def read_data(csv_file):
         """
         Lee un archivo CSV y devuelve un DataFrame con coordenadas filtradas
         basándose en el valor de precisión definido en las configuraciones.
         """
-        _, _, valid_precision = self.load_configuration()
+        _, _, valid_precision = FileSystem.load_configuration()
         df = pd.read_csv(csv_file)
         return df[df['precision'] <= valid_precision]
 
-    def create_directories(self, directories):
+    @staticmethod
+    def create_directories(directories):
         """Crea múltiples directorios si no existen."""
         for directory in directories:
             os.makedirs(directory, exist_ok=True)
 
-    def process_secured_areas(self, obj, secured_areas, prox_distance):
+    @staticmethod
+    def process_secured_areas(obj, secured_areas, prox_distance):
         """Procesa las zonas protegidas."""
         for area in secured_areas:
             obj.add_safe_zone(area, prox_distance)
 
-    def load_configuration(self):
+    @staticmethod
+    def load_configuration():
         """Carga las configuraciones necesarias desde las variables de entorno."""
         load_dotenv()
         proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
@@ -67,5 +72,5 @@ class FileSystem:
         """Configura el entorno de trabajo."""
         os.chdir(self.base_dir)
         data_dir, result_dir = self.get_directories()
-        self.create_directories([data_dir, result_dir])
+        FileSystem.create_directories([data_dir, result_dir])
         return self.base_dir, data_dir, result_dir

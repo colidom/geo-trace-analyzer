@@ -41,14 +41,31 @@ GeoTrace Analyzer es una herramienta avanzada para visualizar y analizar datos g
 
     ```env
     PROXIMITY_DISTANCE=200 # Distancia en metros
-    SECURED_AREAS="[
-    {\"name\": \"Domicilio\", \"coordinates\": [28.415868, -16.54943], \"type\": \"home\"},
-    {\"name\": \"Centro de Trabajo\", \"coordinates\": [28.419970, -16.541350], \"type\": \"briefcase\"},
-    {\"name\": \"Centro de Estudios\", \"coordinates\": [28.41211, -16.550324], \"type\": \"school\"}
-    ]"
+    VALID_PRECISION=100
 
     ```
 
+5. Configura el `secured_areas.json` en el directorio principal:
+    ```json
+    [
+        {
+            "name": "Domicilio",
+            "coordinates": [28.415868, -16.54943],
+            "type": "home"
+        },
+        {
+            "name": "Centro de Trabajo",
+            "coordinates": [28.41945820893739, -16.542202123565886],
+            "type": "briefcase"
+        },
+        {
+            "name": "Centro de Estudios",
+            "coordinates": [28.41211, -16.550324],
+            "type": "school"
+        }
+    ]
+    ```
+   
 ## Estructura del proyecto
 
 ```plaintext
@@ -56,13 +73,13 @@ GeoTrace Analyzer/
 │
 ├── classes/               # Archivos CSV con datos de entrada
 │   ├── Map.py             # Contiene los métodos para manejar el mapa
+│   ├── Filesystem.py      # Gestión de archivos
 ├── data/                  # Archivos CSV con datos de entrada
 ├── result/                # Salida de mapas generados
 ├── utils/                 # Módulos auxiliares
-│   ├── filesystem.py      # Gestión de archivos
-│   ├── map.py             # Funciones de manipulación de mapas
 │   ├── distance.py        # Cálculos de distancia
 ├── .env                   # Configuración de variables de entorno
+├── secured_areas.json     # Configuración de zonas seguras
 ├── requirements.txt       # Dependencias del proyecto
 ├── main.py                # Script principal
 └── README.md              # Documentación del proyecto
@@ -118,7 +135,7 @@ Los archivos deben tener las siguientes columnas: `time`, `precision`, y `locati
 
 ## Ejemplo visual
 
-<img src="img/example_map.png" alt="Mapa generado" width="600">
+<img src="img/example_map.png" alt="Mapa generado" width="1494">
 
 ## Contribuciones
 

@@ -1,6 +1,6 @@
 import folium
 import os
-from utils.distance import calculate_distance, process_location
+from utils.distance import calculate_distance, extract_coordinates
 
 
 class Map:
@@ -130,8 +130,8 @@ class Map:
     def is_aggressor_near(self, victim_lat, victim_lng, aggressor_data, proximity_distance):
         aggressor_nearby = False
         for _, aggressor_row in aggressor_data.iterrows():
-            aggressor_coordinates = process_location(
-                aggressor_row, location_column="location"
+            aggressor_coordinates = extract_coordinates(
+                aggressor_row, column="location"
             )
             if aggressor_coordinates:
                 aggressor_lat, aggressor_lng = aggressor_coordinates
@@ -151,7 +151,7 @@ class Map:
 
     def get_coordinates(self, data_row, location_column):
         try:
-            return process_location(data_row, location_column=location_column)
+            return extract_coordinates(data_row, location_column)
         except Exception as e:
             print(f"Error al procesar coordenadas: {e}")
             return None

@@ -102,7 +102,7 @@ def test_check_prox_and_add_markers(map_instance, mocker):
         (1, {"location": "10.0,10.0"})
     ])
 
-    mocker.patch("classes.Map.process_location",
+    mocker.patch("classes.Map.calculate_distance",
                  side_effect=lambda row, **k: tuple(map(float, row["location"].split(","))))
     mocker.patch("classes.Map.calculate_distance", side_effect=lambda x, y: 100.0)
 

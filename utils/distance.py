@@ -1,34 +1,57 @@
 from geopy.distance import geodesic
 from functools import lru_cache
 
+# Constants for error messages
+INVALID_LOCATION_MSG = "Ubicación no válida en '{column}': {value}. Ignorando fila."
+UNEXPECTED_TYPE_MSG = "Valor inesperado en '{column}': {value}. Ignorando fila."
+
 
 @lru_cache(maxsize=1024)
 def calculate_distance(coord1, coord2):
     """
-    Calcula la distancia en metros entre dos coordenadas geográficas usando la librería geopy.
-
-    :param coord1: Tupla (latitud, longitud) del primer punto.
-    :param coord2: Tupla (latitud, longitud) del segundo punto.
-    :return: Distancia en metros entre los dos puntos.
+    Calculates the distance in meters between two geographic coordinates using the geopy library.
+    :param coord1: Tuple (latitude, longitude) of the first point.
+    :param coord2: Tuple (latitude, longitude) of the second point.
+    :return: Distance in meters between the two points.
     """
     return geodesic(coord1, coord2).meters
 
 
-def process_location(data_row, location_column="location"):
-    """Procesa la ubicación de un dato, extrayendo las coordenadas de latitud y longitud."""
-    location = data_row[location_column]
-
-    # Asegurarnos de que location sea una cadena
+def validate_location(location, column):
+    """
+    Validates the location value, ensuring it is a string and not a float.
+    :param location: The value of the location column.
+    :param column: The name of the location column.
+    :return: True if the location is valid, otherwise logs an error and returns False.
+    """
     if isinstance(location, float):
-        print(f"Valor inesperado en '{location_column}': {location}. Ignorando fila.")
-        return None  # Retorna None si location es un flotante
+        print(UNEXPECTED_TYPE_MSG.format(column=column, value=location))
+        return False
+    return True
 
-    # Si es una cadena, intentamos dividirla
+
+def parse_coordinates(location, column):
+    """
+    Parses a location string into latitude and longitude.
+    :param location: The location string to parse.
+    :param column: The name of the location column.
+    :return: Tuple (latitude, longitude) if parsing succeeds, otherwise logs an error and returns None.
+    """
     try:
-        lat, lng = map(float, location.split(","))
-        return lat, lng
+        return tuple(map(float, location.split(",")))
     except ValueError:
-        print(
-            f"Ubicación no válida en '{location_column}': {location}. Ignorando fila."
-        )
+        print(INVALID_LOCATION_MSG.format(column=column, value=location))
         return None
+
+
+def extract_coordinates(row, column="location"):
+    """
+    Extracts geographic coordinates from a data row, handling errors gracefully.
+    :param row: The data row containing the location information.
+    :param column: The column name where the location string is located.
+    :return: Tuple (latitude, longitude) if valid, otherwise None.
+    """
+    location = row.get(column)
+    if location is None or not validate_location(location, column):
+        return None
+    return parse_coordinates(location, column)

@@ -123,9 +123,12 @@ class FileSystem:
                  - valid_precision (list): A list describing valid precision values.
         """
         load_dotenv()
-        proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
-        secured_areas = json.loads(os.getenv("SECURED_AREAS"))
-        valid_precision = json.loads(os.getenv("VALID_PRECISION"))
+        try:
+            proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
+            secured_areas = json.loads(os.getenv("SECURED_AREAS"))
+            valid_precision = json.loads(os.getenv("VALID_PRECISION"))
+        except (TypeError, ValueError, json.JSONDecodeError) as e:
+            raise ValueError(f"Error al cargar las configuraciones: {e}")
         return proximity_distance, secured_areas, valid_precision
 
     def get_directories(self):

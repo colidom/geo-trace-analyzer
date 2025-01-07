@@ -112,22 +112,35 @@ class FileSystem:
     @staticmethod
     def load_configuration():
         """
-        Fetches configuration values from environment variables and processes them into
-        appropriate Python datatypes for later usage in the application. This includes
-        loading the .env file, extracting proximity distance, secured areas, and valid
-        precision, and converting them into usable forms.
+        Load configuration settings for proximity checks.
 
-        @return: A tuple containing the following in order:
-                 - proximity_distance (int): The distance value used for proximity calculations.
-                 - secured_areas (list): A list of secured area details.
-                 - valid_precision (list): A list describing valid precision values.
+        This static method retrieves configuration values from the environment and
+        loads secure area data from a JSON file. It ensures all required configurations
+        are parsed and validated before being returned for further use.
+
+        Raises
+        ------
+        ValueError
+            If there is an error parsing or retrieving the configuration values or
+            loading the JSON file.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the following:
+            - proximity_distance (int): The distance value for proximity checks.
+            - secured_areas (list): A list of secured areas loaded from the JSON file.
+            - valid_precision (int): The precision value for validation calculations.
         """
         load_dotenv()
         try:
             proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
-            secured_areas = json.loads(os.getenv("SECURED_AREAS"))
-            valid_precision = json.loads(os.getenv("VALID_PRECISION"))
-        except (TypeError, ValueError, json.JSONDecodeError) as e:
+            valid_precision = int(os.getenv("VALID_PRECISION"))
+
+            with open("secured_areas.json", "r") as file:
+                secured_areas = json.load(file)
+
+        except (TypeError, ValueError, json.JSONDecodeError, FileNotFoundError) as e:
             raise ValueError(f"Error al cargar las configuraciones: {e}")
         return proximity_distance, secured_areas, valid_precision
 

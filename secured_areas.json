@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Domicilio",
+        "coordinates": [28.415868, -16.54943],
+        "type": "home"
+    },
+    {
+        "name": "Centro de Trabajo",
+        "coordinates": [28.41945820893739, -16.542202123565886],
+        "type": "briefcase"
+    },
+    {
+        "name": "Centro de Estudios",
+        "coordinates": [28.41211, -16.550324],
+        "type": "school"
+    }
+]

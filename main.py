@@ -6,8 +6,8 @@ from classes.Map import Map
 def main():
     # Instanciar FileSystem y configurar el entorno
     fs = FileSystem()
-    proximity_distance, secured_areas, valid_precision = FileSystem.load_configuration()
-    script_dir, data_dir, result_dir = fs.setup_environment()
+    proximity_distance, secured_areas, _ = FileSystem.load_configuration()
+    _, data_dir, result_dir = fs.setup_environment()
 
     # Configuración del mapa
     map_center = secured_areas[0]["coordinates"]

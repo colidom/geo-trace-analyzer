@@ -130,12 +130,12 @@ class FileSystem:
             A tuple containing the following:
             - proximity_distance (int): The distance value for proximity checks.
             - secured_areas (list): A list of secured areas loaded from the JSON file.
-            - valid_precision (int): The precision value for validation calculations.
+            - valid_precision (float): The precision value for validation calculations.
         """
         load_dotenv()
         try:
             proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
-            valid_precision = int(os.getenv("VALID_PRECISION"))
+            valid_precision = float(os.getenv("VALID_PRECISION"))  # Mantener como float
 
             with open("secured_areas.json", "r") as file:
                 secured_areas = json.load(file)

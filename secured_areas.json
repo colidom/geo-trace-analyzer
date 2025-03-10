@@ -9,6 +9,6 @@
         "name": "Centro de Trabajo",
         "coordinates": [40.4653545, -3.68988525],
         "type": "briefcase",
-        "active": true
+        "active": false
     }
 ]

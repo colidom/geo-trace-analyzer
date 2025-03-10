@@ -12,7 +12,7 @@ class Map:
             center (tuple[float, float]): Latitude and longitude values representing the center of the map.
             zoom_start (int, optional): The initial zoom level for the map. Defaults to 15.
         """
-        self.map = folium.Map(location=center, zoom_start=zoom_start)
+        self.map = folium.Map(location=center, zoom_start=zoom_start, tiles="Cartodb Positron")
 
     def add_safe_zone(self, secured_area, proximity_distance):
         """
@@ -65,7 +65,7 @@ class Map:
             location=location,
             radius=proximity_distance,
             color=color,
-            fill=True,
+            fill=False,
             fill_opacity=0.2,
             tooltip=tooltip,
         ).add_to(self.map)

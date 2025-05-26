@@ -90,25 +90,27 @@ class Map:
             icon=folium.Icon(color=color, icon=icon, prefix="fa"),
         ).add_to(self.map)
 
-    def add_aggressor_route(self, aggressor_positions, color):
+    def add_entity_route(self, entity_positions, color, entity_type):
         """
-        Adds a route to the map representing the aggressor's movement. This method
-        visualizes a path using a polyline if multiple positions of the aggressor
-        are provided. The route is drawn with the specified color.
+        Adds a route to the map representing the movements of a specified entity type.
+        This method visualizes a path using a polyline if multiple positions are provided.
+        The route is drawn with the specified color.
 
         Parameters:
-            aggressor_positions (list): A list of positions representing the
-            coordinates of the aggressor's path. Each position is expected to be a
+            entity_positions (list): A list of positions representing the
+            coordinates of the entity's path. Each position is expected to be a
             tuple or list of latitude and longitude values.
             color (str): The color of the polyline representing the route on the map.
+            entity_type (str): A string indicating the type of entity (e.g., "Agresor" or "Víctima").
 
         Returns:
             None
         """
-        if len(aggressor_positions) > 1:
+        if len(entity_positions) > 1:
             folium.PolyLine(
-                aggressor_positions, color=color, weight=2.5, opacity=1
+                entity_positions, color=color, weight=2.5, opacity=1
             ).add_to(self.map)
+
 
     def save(self, result_folder, output_file):
         """
@@ -208,92 +210,49 @@ class Map:
 
     def check_prox_and_add_markers(self, victim_data, aggressor_data, proximity_distance):
         """
-        Processes victim and aggressor data to determine proximity and add markers.
-
-        This function iterates over victim data rows, calculates proximity to aggressors,
-        and processes the coordinates of any detected victim within the specified proximity.
-        It increments the victim position for each processed row. After handling victims, it
-        processes the aggressor data to determine positions and adds a route marker for them.
-
-        Arguments:
-            victim_data: DataFrame containing victim information
-            aggressor_data: DataFrame containing aggressor information
-            proximity_distance (float): Maximum allowable distance to determine proximity
-
-        Returns:
-            None
-        """
-        victim_position = aggressor_position = 1
-
-        for _, victim_data_row in victim_data.iterrows():
-            victim_coordinates = self.process_victim(
-                victim_data_row, aggressor_data, proximity_distance, victim_position
-            )
-            if victim_coordinates:
-                victim_position += 1
-
-        aggressor_positions = self.process_aggressors(aggressor_data, aggressor_position)
-        self.add_aggressor_route(aggressor_positions, "red")
-
-    def process_victim(self, victim_data_row, aggressor_data, proximity_distance, victim_position):
-        """
-        Processes a victim entity by analyzing its coordinates, checking for proximity
-        to an aggressor, and taking necessary actions when proximity is confirmed.
-        Returns the victim's coordinates if processing is conducted.
+        Checks proximity between victims and aggressors, and adds markers accordingly.
 
         Args:
-            victim_data_row: dict
-                A dictionary containing the data row for the victim, from which
-                location information can be extracted.
-            aggressor_data: Any
-                The data representing the aggressor, used to determine proximity.
+            victim_data: pd.DataFrame
+                Data containing information about victims.
+            aggressor_data: pd.DataFrame
+                Data containing information about aggressors.
             proximity_distance: float
                 The distance threshold to determine whether an aggressor is near a victim.
-            victim_position: Any
-                Additional data or metadata representing a victim's position.
 
         Returns:
-            tuple[float, float] or None:
-                Returns a tuple of latitude and longitude as the victim's coordinates if
-                they are processed, or None if coordinates are not available.
-
-        Raises:
-            Does not explicitly raise any exceptions.
+            None: This function does not return a value.
         """
-        victim_coordinates = self.get_coordinates(victim_data_row, "location")
-        if not victim_coordinates:
-            return None
-        victim_lat, victim_lng = victim_coordinates
-        if self.is_aggressor_near(victim_lat, victim_lng, aggressor_data, proximity_distance):
-            self.process_entity(victim_lat, victim_lng, victim_position, victim_data_row, "Víctima", "green", "female")
-        return victim_coordinates
+        initial_position = 0
 
-    def process_aggressors(self, aggressor_data, aggressor_position):
-        """
-        Processes the aggressor data to extract coordinates, process entities, and maintain
-        their positions. This function iterates through aggressor data, retrieves geographical
-        coordinates, appends them to a list, and invokes additional processing methods
-        for each aggressor.
-
-        Args:
-            aggressor_data (pd.DataFrame): The data containing information about aggressors.
-            aggressor_position (int): The initial position index for aggressors.
-
-        Returns:
-            list: A list of tuples where each tuple represents the latitude and longitude
-            coordinates of an aggressor.
-
-        """
+        # Procesar agresores
         aggressor_positions = []
         for _, aggressor_row in aggressor_data.iterrows():
             aggressor_coordinates = self.get_coordinates(aggressor_row, "location")
             if aggressor_coordinates:
                 aggressor_lat, aggressor_lng = aggressor_coordinates
                 aggressor_positions.append((aggressor_lat, aggressor_lng))
-                self.process_entity(aggressor_lat, aggressor_lng, aggressor_position, aggressor_row, "Agresor", "red",
-                                    "male")
-                aggressor_position += 1
-        return aggressor_positions
+                self.process_entity(aggressor_lat, aggressor_lng, initial_position, aggressor_row, "Agresor", "red", "male")
+                initial_position += 1
+
+        # Lista para almacenar las posiciones de las víctimas
+        victim_positions = []
+
+        # Procesar víctimas
+        for _, victim_row in victim_data.iterrows():
+            victim_coordinates = self.get_coordinates(victim_row, "location")
+            if victim_coordinates:
+                victim_lat, victim_lng = victim_coordinates
+                # Verificar proximidad y procesar la víctima
+                if self.is_aggressor_near(victim_lat, victim_lng, aggressor_data, proximity_distance):
+                    self.process_entity(victim_lat, victim_lng, initial_position, victim_row, "Víctima", "green", "female")
+                    victim_positions.append((victim_lat, victim_lng))  # Agregar posición a la lista
+                initial_position += 1
+
+        # Agregar rutas para agresores y víctimas usando el método genérico
+        self.add_entity_route(aggressor_positions, "red", "Agresor")
+        self.add_entity_route(victim_positions, "green", "Víctima")
+
 
     def is_aggressor_near(self, victim_lat, victim_lng, aggressor_data, proximity_distance):
         """

@@ -73,6 +73,10 @@ class FileSystem:
         """
         _, _, valid_precision = FileSystem.load_configuration()
         df = pd.read_csv(csv_file)
+
+        if 'valid' not in df.columns:
+            df['valid'] = 0  # Asumimos que todo es válido si no está la columna
+
         return df[df['precision'] <= valid_precision]
 
     @staticmethod

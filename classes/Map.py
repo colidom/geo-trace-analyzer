@@ -1,6 +1,6 @@
 import folium
 import os
-from utils.distance import calculate_distance, extract_coordinates
+from src.distance import calculate_distance, extract_coordinates
 
 
 class Map:
@@ -305,6 +305,8 @@ class Map:
             icon: The icon to use for the marker representation.
         """
         tooltip_text = self.add_tooltip(position, lng, lat, data_row, entity_type)
+        is_valid = data_row.get("valid", 0) == 0
+        color = "green" if is_valid else "gray"
         self.add_marker((lat, lng), tooltip_text, color, icon)
 
     @staticmethod

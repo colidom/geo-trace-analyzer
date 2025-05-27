@@ -1,7 +1,6 @@
-import os
 from classes.FileSystem import FileSystem
 from classes.Map import Map
-
+from src.utils import choose_file
 
 def main():
     fs = FileSystem()
@@ -12,23 +11,24 @@ def main():
     # Configurar el entorno de trabajo
     _, data_dir, result_dir = fs.setup_environment()
 
+    aggressor_file = choose_file("AGRESORES")
+    victim_file = choose_file("VÍCTIMAS")
+
+    # Leer datos desde los ficheros seleccionados
+    aggressor_data = FileSystem.read_data(FileSystem.get_csv_file(aggressor_file))
+    victim_data = FileSystem.read_data(FileSystem.get_csv_file(victim_file))
+
     # Buscar la primera área segura activa y usarla para centrar el mapa
     active_area = next((area for area in secured_areas if area['active']), None)
 
     if active_area:
         map_center = active_area["coordinates"]
     else:
-        # Centrar en el primer agresor si no hay área activa
-        aggressor_data = FileSystem.read_data(FileSystem.get_csv_file(os.path.join(data_dir, "A.csv")))
         first_aggressor_location = aggressor_data.iloc[0]['location'].split(',')
         map_center = [float(first_aggressor_location[0]), float(first_aggressor_location[1])]
 
     # Crear el mapa
     map_instance = Map(map_center)
-
-    # Cargar los datos de agresores y víctimas
-    aggressor_data = FileSystem.read_data(FileSystem.get_csv_file(os.path.join(data_dir, "A.csv")))
-    victim_data = FileSystem.read_data(FileSystem.get_csv_file(os.path.join(data_dir, "V.csv")))
 
     # Procesar áreas seguras y marcar datos en el mapa
     FileSystem.process_secured_areas(map_instance, secured_areas, proximity_distance)

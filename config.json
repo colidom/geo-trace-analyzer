@@ -1,0 +1,18 @@
+{
+  "proximity_distance": 500,
+  "valid_precision": 450,
+  "secured_areas": [
+    {
+      "name": "Domicilio",
+      "coordinates": [43.3040521, -8.515486],
+      "type": "home",
+      "active": false
+    },
+    {
+      "name": "Centro de Trabajo",
+      "coordinates": [43.2927376, -8.5312681],
+      "type": "briefcase",
+      "active": false
+    }
+  ]
+}

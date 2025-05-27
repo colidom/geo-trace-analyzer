@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import json
-from dotenv import load_dotenv
 
 
 class FileSystem:
@@ -116,11 +115,11 @@ class FileSystem:
     @staticmethod
     def load_configuration():
         """
-        Load configuration settings for proximity checks.
+        Load configuration settings for proximity checks from a unified JSON file.
 
-        This static method retrieves configuration values from the environment and
-        loads secure area data from a JSON file. It ensures all required configurations
-        are parsed and validated before being returned for further use.
+        This static method retrieves configuration values and secure area data
+        from a single JSON file. It ensures all required configurations are
+        parsed and validated before being returned for further use.
 
         Raises
         ------
@@ -131,21 +130,22 @@ class FileSystem:
         Returns
         -------
         tuple
-            A tuple containing the following:
+            A tuple containing:
             - proximity_distance (int): The distance value for proximity checks.
-            - secured_areas (list): A list of secured areas loaded from the JSON file.
-            - valid_precision (float): The precision value for validation calculations.
+            - secured_areas (list): A list of secured areas.
+            - valid_precision (float): The precision value for validation.
         """
-        load_dotenv()
         try:
-            proximity_distance = int(os.getenv("PROXIMITY_DISTANCE"))
-            valid_precision = float(os.getenv("VALID_PRECISION"))  # Mantener como float
+            with open("config.json", "r") as file:
+                config = json.load(file)
 
-            with open("secured_areas.json", "r") as file:
-                secured_areas = json.load(file)
+            proximity_distance = int(config.get("proximity_distance"))
+            valid_precision = float(config.get("valid_precision"))
+            secured_areas = config.get("secured_areas", [])
 
         except (TypeError, ValueError, json.JSONDecodeError, FileNotFoundError) as e:
             raise ValueError(f"Error al cargar las configuraciones: {e}")
+
         return proximity_distance, secured_areas, valid_precision
 
     def get_directories(self):

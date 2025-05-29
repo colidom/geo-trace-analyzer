@@ -301,13 +301,14 @@ class Map:
             position: A string representing the general position or area of the entity.
             data_row: The dataset row containing additional information about the entity.
             entity_type: The type or category of the entity.
-            color: The color to use for the marker representation.
+            color: The default color to use for the marker (depends on entity_type).
             icon: The icon to use for the marker representation.
         """
         tooltip_text = self.add_tooltip(position, lng, lat, data_row, entity_type)
         is_valid = data_row.get("valid", 0) == 0
-        color = "green" if is_valid else "gray"
-        self.add_marker((lat, lng), tooltip_text, color, icon)
+
+        final_color = color if is_valid else "gray"
+        self.add_marker((lat, lng), tooltip_text, final_color, icon)
 
     @staticmethod
     def get_coordinates(data_row, location_column):
